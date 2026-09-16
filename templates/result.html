@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Resultado del Diagnostico</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 480px; margin: 60px auto; }
+        .status { font-size: 24px; font-weight: bold; padding: 12px; border-radius: 8px; text-align: center; }
+        .SALUDABLE { background: #d4edda; color: #155724; }
+        .EN_RIESGO { background: #fff3cd; color: #856404; }
+        .CRITICO { background: #f8d7da; color: #721c24; }
+        table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+        td, th { padding: 8px; border-bottom: 1px solid #ddd; text-align: left; }
+        a { display: inline-block; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Resultado para "{{ result.plant_name }}" ({{ result.plant_type }})</h1>
+
+    <div class="status {{ result.status.value }}">
+        {{ result.status.value }}
+    </div>
+
+    <table>
+        <tr><th>Indicador</th><th>Nivel</th></tr>
+        <tr><td>Humedad</td><td>{{ result.levels['humidity'].value }}</td></tr>
+        <tr><td>Luz</td><td>{{ result.levels['light'].value }}</td></tr>
+        <tr><td>Temperatura</td><td>{{ result.levels['temperature'].value }}</td></tr>
+    </table>
+
+    <a href="/">← Nueva evaluacion</a>
+</body>
+</html>

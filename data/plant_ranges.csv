@@ -1,0 +1,6 @@
+plant_type,humidity_min,humidity_max,light_min,light_max,temperature_min,temperature_max
+cactus,10,30,70,100,20,35
+helecho,60,85,20,50,15,24
+suculenta,15,35,60,100,18,30
+orquidea,50,70,30,60,18,26
+default,40,60,40,70,18,28

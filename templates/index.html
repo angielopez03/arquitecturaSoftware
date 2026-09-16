@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Diagnostico de Plantas</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 480px; margin: 60px auto; }
+        label { display: block; margin-top: 12px; font-weight: bold; }
+        input, select { width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box; }
+        button { margin-top: 20px; padding: 10px 20px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🌱 Diagnostico de Plantas</h1>
+    <form action="/evaluar" method="post">
+        <label for="plant_name">Nombre de la planta</label>
+        <input type="text" id="plant_name" name="plant_name" required>
+
+        <label for="plant_type">Tipo de planta</label>
+        <select id="plant_type" name="plant_type">
+            <option value="cactus">Cactus</option>
+            <option value="helecho">Helecho</option>
+            <option value="suculenta">Suculenta</option>
+            <option value="orquidea">Orquidea</option>
+        </select>
+
+        <label for="humidity">Humedad (%)</label>
+        <input type="number" step="0.1" id="humidity" name="humidity" required>
+
+        <label for="light">Luz (%)</label>
+        <input type="number" step="0.1" id="light" name="light" required>
+
+        <label for="temperature">Temperatura (°C)</label>
+        <input type="number" step="0.1" id="temperature" name="temperature" required>
+
+        <button type="submit">Diagnosticar</button>
+    </form>
+</body>
+</html>
