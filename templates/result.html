@@ -3,16 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Resultado del Diagnostico</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 480px; margin: 60px auto; }
-        .status { font-size: 24px; font-weight: bold; padding: 12px; border-radius: 8px; text-align: center; }
-        .SALUDABLE { background: #d4edda; color: #155724; }
-        .EN_RIESGO { background: #fff3cd; color: #856404; }
-        .CRITICO { background: #f8d7da; color: #721c24; }
-        table { width: 100%; margin-top: 20px; border-collapse: collapse; }
-        td, th { padding: 8px; border-bottom: 1px solid #ddd; text-align: left; }
-        a { display: inline-block; margin-top: 20px; }
-    </style>
+    <link rel="stylesheet" href="../static/css/estilos.css"">
 </head>
 <body>
     <h1>Resultado para "{{ result.plant_name }}" ({{ result.plant_type }})</h1>

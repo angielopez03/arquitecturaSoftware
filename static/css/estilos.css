@@ -1,0 +1,66 @@
+body {
+    font-family: Arial, sans-serif;
+    max-width: 480px;
+    margin: 60px auto;
+}
+
+label {
+    display: block;
+    margin-top: 12px;
+    font-weight: bold;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 4px;
+    box-sizing: border-box;
+}
+
+button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.status {
+    font-size: 24px;
+    font-weight: bold;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.SALUDABLE {
+    background: #d4edda;
+    color: #155724;
+}
+
+.EN_RIESGO {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.CRITICO {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+td,
+th {
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+a {
+    display: inline-block;
+    margin-top: 20px;
+}
