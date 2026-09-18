@@ -1,6 +1,23 @@
+from dataclasses import dataclass
 from typing import Any, Dict, List
 
 from backend.domain.ports.range_repository import RangeRepository
+
+
+@dataclass(frozen=True)
+class EspecieCatalogo:
+    nombre: str
+    rangos: Dict[str, Any]
+
+    def __getitem__(self, item):
+        if item in ("nombre", "name"):
+            return self.nombre
+        if item in ("rangos", "ranges"):
+            return self.rangos
+        raise KeyError(item)
+
+    def __contains__(self, item):
+        return item in ("nombre", "name", "rangos", "ranges")
 
 
 class ListSpeciesService:
@@ -10,7 +27,7 @@ class ListSpeciesService:
 
     Responsabilidades:
     - Consultar el catálogo de especies a través del puerto RangeRepository (RA5 / DIP).
-    - Exponer la lista estructurada de especies y sus rangos en objetos estándar de Python.
+    - Exponer la lista estructurada de especies y sus rangos.
 
     Restricciones respetadas:
     - RA3: Vive en la capa de aplicación como orquestador.
@@ -22,52 +39,38 @@ class ListSpeciesService:
     def __init__(self, repository: RangeRepository):
         self._repository = repository
 
-    def execute(self) -> List[Dict[str, Any]]:
+    def ejecutar(self) -> List[EspecieCatalogo]:
         """
-        Ejecuta el caso de uso para listar las especies disponibles y sus rangos de referencia (RF5).
-
-        :return: Lista de diccionarios con el nombre de la especie y los rangos de cada parámetro.
-                 Estructura compatible con el contrato de API del Anexo A:
-                 [
-                     {
-                         "nombre": "sansevieria",
-                         "rangos": {
-                             "humedad": [20.0, 45.0],
-                             "luz": [200.0, 1500.0],
-                             "temperatura": [15.0, 29.0]
-                         }
-                     },
-                     ...
-                 ]
+        Retorna la lista de especies con sus rangos de referencia (RF5).
         """
         all_species = self._repository.get_all_species()
-        result: List[Dict[str, Any]] = []
+        result: List[EspecieCatalogo] = []
 
-        param_translations = {
+        mapeo_nombres = {
             "humidity": "humedad",
             "light": "luz",
             "temperature": "temperatura",
         }
 
         for species_name, ranges in sorted(all_species.items()):
-            rangos_dict: Dict[str, List[float]] = {}
+            rangos_adaptados: Dict[str, Any] = {}
             for param, rango in ranges.items():
-                interval = [rango.min_value, rango.max_value]
-                rangos_dict[param] = interval
-                # Soporte para nombres en español del Anexo A
-                if param in param_translations:
-                    rangos_dict[param_translations[param]] = interval
+                nombre_es = mapeo_nombres.get(param, param)
+                rangos_adaptados[nombre_es] = rango
+                rangos_adaptados[param] = rango
 
-            species_data = {
-                "nombre": species_name,
-                "name": species_name,
-                "rangos": rangos_dict,
-                "ranges": rangos_dict,
-            }
-            result.append(species_data)
+            result.append(
+                EspecieCatalogo(
+                    nombre=species_name,
+                    rangos=rangos_adaptados,
+                )
+            )
 
         return result
 
+    def execute(self) -> List[EspecieCatalogo]:
+        return self.ejecutar()
 
-# Alias en español para máxima compatibilidad con el enunciado
+
+# Alias en español para máxima compatibilidad
 ListarEspecies = ListSpeciesService

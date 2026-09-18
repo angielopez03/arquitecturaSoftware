@@ -1,8 +1,8 @@
 import os
 import pytest
-from backend.domain.models.entities import Measurement, Plant
-from backend.domain.models.enums import IndicatorLevel, PlantStatus
-from backend.domain.models.value_objects import Range
+from backend.domain.model.entities import Measurement, Plant
+from backend.domain.model.enums import IndicatorLevel, PlantStatus
+from backend.domain.model.rango import Range
 from backend.domain.ports.range_repository import RangeRepository
 from backend.domain.rules.indicator_evaluator import IndicatorEvaluator
 from backend.domain.errors import EspecieNoSoportada
@@ -14,7 +14,7 @@ from backend.app import create_app
 
 
 # -----------------------------------------------------------------------------
-# 1. PRUEBAS DEL DOMINIO (Reglas puras, sin frameworks ni I/O)
+# 1. PRUEBAS DEL DOMINIO (Reglas puras, sin frameworks ni I/O - RA4)
 # -----------------------------------------------------------------------------
 
 def test_range_contains_and_distance():
@@ -83,14 +83,26 @@ def test_diagnosis_service_deficiency_recommends_increase():
     repo = FakeRangeRepository()
     service = DiagnosisService(repository=repo, evaluator=IndicatorEvaluator())
 
-    # Humedad baja (10%)
+    # Humedad baja (10%) - 1 desviación deja la planta EN_RIESGO (RF3)
     med = Measurement(humidity=10.0, light=800.0, temperature=22.0)
     res = service.diagnose("sansevieria", med)
 
-    assert res["status"] == PlantStatus.CRITICO
+    assert res["status"] == PlantStatus.EN_RIESGO
     assert res["levels"]["humidity"] == IndicatorLevel.BAJO
     assert len(res["recommendations"]) >= 1
     assert "aumentar" in res["recommendations"][0].lower()
+
+
+def test_diagnosis_service_two_deviations_is_critical():
+    repo = FakeRangeRepository()
+    service = DiagnosisService(repository=repo, evaluator=IndicatorEvaluator())
+
+    # 2 desviaciones (humedad baja y temperatura baja) dejan la planta CRITICA (RF3)
+    med = Measurement(humidity=10.0, light=800.0, temperature=5.0)
+    res = service.diagnose("sansevieria", med)
+
+    assert res["status"] == PlantStatus.CRITICO
+    assert len(res["recommendations"]) >= 2
 
 
 def test_diagnosis_service_excess_recommends_decrease():
@@ -164,7 +176,7 @@ def test_csv_repository_unknown_species_raises_error():
 
 
 # -----------------------------------------------------------------------------
-# 4. PRUEBAS DE INTEGRACIÓN WEB (Flask, CORS, Vistas)
+# 4. PRUEBAS DE INTEGRACIÓN WEB REST (RA1, RA7, RF5, RF6, Anexo A)
 # -----------------------------------------------------------------------------
 
 @pytest.fixture
@@ -175,27 +187,75 @@ def client():
         yield client
 
 
-def test_index_route(client):
+def test_root_route_returns_pure_json(client):
+    """Verifica RA1: el backend responde exclusivamente con JSON, no HTML."""
     res = client.get("/")
     assert res.status_code == 200
+    assert res.is_json
+    data = res.get_json()
+    assert "endpoints" in data
 
 
-def test_evaluar_route_returns_result(client):
-    data = {
-        "plant_name": "Mi Helecho",
-        "plant_type": "helecho",
-        "humidity": "70",
-        "light": "400",
-        "temperature": "20",
-    }
-    res = client.post("/evaluar", data=data)
+def test_api_get_especies_catalog(client):
+    """Verifica RF5: GET /api/v1/especies devuelve el catálogo en JSON."""
+    res = client.get("/api/v1/especies")
     assert res.status_code == 200
-    assert b"SALUDABLE" in res.data or b"Diagn" in res.data
+    assert res.is_json
+    especies = res.get_json()
+    assert len(especies) >= 6
+    assert any(e["nombre"] == "sansevieria" for e in especies)
+
+
+def test_api_post_diagnostico_successful(client):
+    """Verifica RF1-RF4: POST /api/v1/diagnosticos responde diagnóstico con Anexo A."""
+    payload = {
+        "especie": "sansevieria",
+        "humedad": 30.0,
+        "luz": 800.0,
+        "temperatura": 22.0,
+    }
+    res = client.post("/api/v1/diagnosticos", json=payload)
+    assert res.status_code == 200
+    assert res.is_json
+    datos = res.get_json()
+    assert datos["especie"] == "sansevieria"
+    assert datos["estado"] == "SALUDABLE"
+    assert len(datos["parametros"]) == 3
+
+
+def test_api_post_diagnostico_unknown_species_404(client):
+    """Verifica RF6: Especie desconocida responde 404 con JSON uniforme."""
+    payload = {
+        "especie": "planta_extraterrestre",
+        "humedad": 30.0,
+        "luz": 800.0,
+        "temperatura": 22.0,
+    }
+    res = client.post("/api/v1/diagnosticos", json=payload)
+    assert res.status_code == 404
+    assert res.is_json
+    datos = res.get_json()
+    assert datos["error"] == "ESPECIE_NO_SOPORTADA"
+    assert "detalle" in datos
+
+
+def test_api_post_diagnostico_impossible_value_400(client):
+    """Verifica RF6: Valor físicamente imposible responde 400 con JSON uniforme."""
+    payload = {
+        "especie": "sansevieria",
+        "humedad": 150.0,  # Imposible > 100%
+        "luz": 800.0,
+        "temperatura": 22.0,
+    }
+    res = client.post("/api/v1/diagnosticos", json=payload)
+    assert res.status_code == 400
+    assert res.is_json
+    datos = res.get_json()
+    assert datos["error"] == "PARAMETRO_INVALIDO"
 
 
 def test_cors_headers_present(client):
-    """Verifica RA7: CORS habilitado."""
-    res = client.get("/", headers={"Origin": "http://localhost:8080"})
+    """Verifica RA7: CORS habilitado en las rutas del API."""
+    res = client.get("/api/v1/especies", headers={"Origin": "http://localhost:8080"})
     assert res.status_code == 200
-    # Flask-CORS añade Access-Control-Allow-Origin
     assert res.headers.get("Access-Control-Allow-Origin") in ("*", "http://localhost:8080")

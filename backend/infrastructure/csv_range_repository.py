@@ -3,7 +3,7 @@ import os
 from typing import Dict, Optional
 
 from backend.domain.ports.range_repository import RangeRepository
-from backend.domain.models.value_objects import Range
+from backend.domain.model.rango import Range
 from backend.domain.errors import EspecieNoSoportada
 
 

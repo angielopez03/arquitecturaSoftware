@@ -27,16 +27,18 @@ def diagnostico_a_json(diagnostico) -> dict:
 
 
 def especies_a_json(especies) -> list:
+    parametros_oficiales = ("humedad", "luz", "temperatura")
     return [
         {
             "nombre": e.nombre,
             "rangos": {
                 nombre: {
-                    "min": rango.minimo,
-                    "max": rango.maximo,
+                    "min": e.rangos[nombre].minimo,
+                    "max": e.rangos[nombre].maximo,
                     "unidad": UNIDADES.get(nombre, ""),
                 }
-                for nombre, rango in e.rangos.items()
+                for nombre in parametros_oficiales
+                if nombre in e.rangos
             },
         }
         for e in especies

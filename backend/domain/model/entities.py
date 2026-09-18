@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+from backend.domain.model.medicion import Medicion, Measurement
+
 
 @dataclass(frozen=True)
 class Plant:
@@ -8,12 +10,6 @@ class Plant:
     plant_type: str
 
 
-@dataclass(frozen=True)
-class Measurement:
-    """
-    Representa una lectura de indicadores en un momento dado.
-    No importa si vino de un formulario manual o de un sensor IoT.
-    """
-    humidity: float
-    light: float
-    temperature: float
+Planta = Plant
+
+__all__ = ["Plant", "Planta", "Medicion", "Measurement"]
