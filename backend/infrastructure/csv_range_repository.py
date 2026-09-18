@@ -39,3 +39,11 @@ class CSVRangeRepository(RangeRepository):
         data = self._load()
         key = plant_type.strip().lower()
         return data.get(key, data["default"])
+
+    def get_all_species(self) -> Dict[str, Dict[str, Range]]:
+        """
+        Retorna todas las especies reales disponibles en el CSV (RF5).
+        Filtra claves de fallback como 'default'.
+        """
+        data = self._load()
+        return {k: v for k, v in data.items() if k != "default"}

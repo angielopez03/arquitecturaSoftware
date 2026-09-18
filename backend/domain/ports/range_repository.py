@@ -18,3 +18,10 @@ class RangeRepository(ABC):
     @abstractmethod
     def get_ranges(self, plant_type: str) -> Dict[str, Range]:
         raise NotImplementedError
+
+    @abstractmethod
+    def get_all_species(self) -> Dict[str, Dict[str, Range]]:
+        """
+        Retorna el catálogo completo de especies y sus rangos de referencia (RF5).
+        """
+        raise NotImplementedError
