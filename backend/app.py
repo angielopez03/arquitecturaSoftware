@@ -1,6 +1,10 @@
 import os
 from flask import Flask
+from flask_cors import CORS
 
+from backend.presentation.api.diagnostico_controller import crear_blueprint_diagnosticos
+from backend.presentation.api.especies_controller import crear_blueprint_especies
+from backend.presentation.errors.error_handlers import registrar_manejadores
 from backend.domain.rules.indicator_evaluator import IndicatorEvaluator
 from backend.application.diagnosis_service import DiagnosisService
 from backend.infrastructure.csv.csv_range_repository import CSVRangeRepository
@@ -29,7 +33,10 @@ def create_app() -> Flask:
     app.config["INPUT_PROVIDER"] = input_provider
     app.config["DIAGNOSIS_SERVICE"] = diagnosis_service
 
-    app.register_blueprint(plant_bp)
+    app.register_blueprint(crear_blueprint_diagnosticos(diagnosticar_planta))
+    app.register_blueprint(crear_blueprint_especies(listar_especies))
+    registrar_manejadores(app)
+    CORS(app, resources={r"/api/*": {"origins": "*"}})
 
     return app
 
