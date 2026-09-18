@@ -7,8 +7,9 @@ from repositories.csv_range_repository import CSVRangeRepository
 from repositories.input_provider import ManualInputProvider
 from controllers.plant_controller import plant_bp
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-CSV_PATH = os.path.join(BASE_DIR, "data", "plant_ranges.csv")
+BACKEND_DIR = os.path.dirname(os.path.abspath(_file_))
+REPO_ROOT = os.path.dirname(BACKEND_DIR)
+CSV_PATH = os.path.join(REPO_ROOT, "data", "plant_ranges.csv")
 
 
 def create_app() -> Flask:
