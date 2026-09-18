@@ -34,15 +34,26 @@ class CSVRangeRepository(RangeRepository):
 
         data: Dict[str, Dict[str, Range]] = {}
         with open(self._csv_path, newline="", encoding="utf-8") as f:
-            reader = csv.DictReader(f)
+            valid_lines = (line for line in f if line.strip() and not line.strip().startswith("#"))
+            reader = csv.DictReader(valid_lines)
             for row in reader:
-                if not row or not row.get("plant_type"):
+                if not row:
                     continue
-                plant_type = row["plant_type"].strip().lower()
+                plant_type = (row.get("plant_type") or row.get("especie") or "").strip().lower()
+                if not plant_type:
+                    continue
+
+                h_min = float(row.get("humidity_min") or row.get("humedad_min"))
+                h_max = float(row.get("humidity_max") or row.get("humedad_max"))
+                l_min = float(row.get("light_min") or row.get("luz_min"))
+                l_max = float(row.get("light_max") or row.get("luz_max"))
+                t_min = float(row.get("temperature_min") or row.get("temp_min"))
+                t_max = float(row.get("temperature_max") or row.get("temp_max"))
+
                 data[plant_type] = {
-                    "humidity": Range(float(row["humidity_min"]), float(row["humidity_max"])),
-                    "light": Range(float(row["light_min"]), float(row["light_max"])),
-                    "temperature": Range(float(row["temperature_min"]), float(row["temperature_max"])),
+                    "humidity": Range(h_min, h_max),
+                    "light": Range(l_min, l_max),
+                    "temperature": Range(t_min, t_max),
                 }
 
         self._cache = data

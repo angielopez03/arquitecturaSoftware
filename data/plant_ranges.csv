@@ -1,5 +1,10 @@
+# Fuente de referencia: Royal Horticultural Society (RHS) & University of Florida IFAS Extension (ver data/FUENTES.md)
+# Unidades: humedad (%), luz (lux), temperatura (C)
 plant_type,humidity_min,humidity_max,light_min,light_max,temperature_min,temperature_max
-cactus,10,30,70,100,20,35
-helecho,60,85,20,50,15,24
-suculenta,15,35,60,100,18,30
-orquidea,50,70,30,60,18,26
+sansevieria,20,45,200,1500,15,29
+potos,40,70,300,1200,18,30
+suculenta,10,30,800,2500,15,32
+helecho,60,85,150,800,16,26
+lavanda,25,50,1000,3000,15,30
+orquidea,50,75,400,1000,18,28
+cactus,10,30,800,2500,18,35
