@@ -6,7 +6,7 @@
  * archivo no contiene ni un solo nombre de especie escrito a mano.
  */
 const urlParams = new URLSearchParams(window.location.search);
-const API = urlParams.get("api") || "http://localhost:5000/api/v1";
+const API = urlParams.get("api") || "https://arquitecturasoftware-production-985c.up.railway.app/api/v1";
 
 const form = document.getElementById("formulario");
 const selectEspecie = document.getElementById("especie");
