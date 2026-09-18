@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict
 
-from backend.domain.model.value_objects import Range
+from backend.domain.models.value_objects import Range
 
 
 class RangeRepository(ABC):
@@ -17,4 +17,11 @@ class RangeRepository(ABC):
 
     @abstractmethod
     def get_ranges(self, plant_type: str) -> Dict[str, Range]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_all_species(self) -> Dict[str, Dict[str, Range]]:
+        """
+        Retorna el catálogo completo de especies y sus rangos de referencia (RF5).
+        """
         raise NotImplementedError

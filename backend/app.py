@@ -1,47 +1,46 @@
-import os
+from typing import Optional
+
 from flask import Flask
-from flask_cors import CORS
 
-from backend.presentation.api.diagnostico_controller import crear_blueprint_diagnosticos
-from backend.presentation.api.especies_controller import crear_blueprint_especies
-from backend.presentation.errors.error_handlers import registrar_manejadores
-from backend.domain.rules.indicator_evaluator import IndicatorEvaluator
 from backend.application.diagnosis_service import DiagnosisService
-from backend.infrastructure.csv.csv_range_repository import CSVRangeRepository
-from backend.infrastructure.input_provider import ManualInputProvider
-from backend.presentation.api.plant_controller import plant_bp
-
-BACKEND_DIR = os.path.dirname(os.path.abspath(_file_))
-REPO_ROOT = os.path.dirname(BACKEND_DIR)
-CSV_PATH = os.path.join(REPO_ROOT, "data", "plant_ranges.csv")
+from backend.application.list_species_service import ListSpeciesService
+from backend.domain.rules.indicator_evaluator import IndicatorEvaluator
+from backend.infrastructure.config import Config
+from backend.infrastructure.csv_range_repository import CSVRangeRepository
+from backend.presentation.plant_controller import plant_bp
 
 
-def create_app() -> Flask:
+def create_app(config: Optional[Config] = None) -> Flask:
+    """
+    Application Factory & Composition Root (RA3).
+    Único punto del sistema donde se ensamblan las implementaciones concretas
+    de las cuatro capas arquitectónicas.
+    """
+    cfg = config or Config.from_env()
     app = Flask(__name__)
 
-    # --- Composition Root ---
-    # Unico lugar donde se elige la implementacion concreta.
-    # Cambiar CSV -> DB: reemplazar esta linea por SQLRangeRepository(...)
-    range_repository = CSVRangeRepository(CSV_PATH)
-
-    # Cambiar manual -> sensor: reemplazar esta linea por SensorInputProvider(...)
-    input_provider = ManualInputProvider()
-
+    range_repository = CSVRangeRepository(cfg.csv_path)
     evaluator = IndicatorEvaluator()
     diagnosis_service = DiagnosisService(repository=range_repository, evaluator=evaluator)
+    list_species_service = ListSpeciesService(repository=range_repository)
 
-    app.config["INPUT_PROVIDER"] = input_provider
+    app.config["CONFIG"] = cfg
     app.config["DIAGNOSIS_SERVICE"] = diagnosis_service
+    app.config["LIST_SPECIES_SERVICE"] = list_species_service
 
-    app.register_blueprint(crear_blueprint_diagnosticos(diagnosticar_planta))
-    app.register_blueprint(crear_blueprint_especies(listar_especies))
-    registrar_manejadores(app)
-    CORS(app, resources={r"/api/*": {"origins": "*"}})
+    app.register_blueprint(plant_bp)
+
+    try:
+        from flask_cors import CORS
+
+        CORS(app, resources={r"/*": {"origins": cfg.cors_origins}})
+    except ImportError:
+        pass
 
     return app
 
 
 if __name__ == "__main__":
-    app = create_app()
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    cfg = Config.from_env()
+    app = create_app(cfg)
+    app.run(host=cfg.host, port=cfg.port)

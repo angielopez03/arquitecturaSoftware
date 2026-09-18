@@ -2,7 +2,7 @@ from flask import Blueprint, current_app, render_template, request
 
 from backend.domain.models.entities import Measurement, Plant
 
-plant_bp = Blueprint("plant_bp", __name__, template_folder="../../templates")
+plant_bp = Blueprint("plant_bp", __name__, template_folder="templates")
 
 
 @plant_bp.route("/", methods=["GET"])

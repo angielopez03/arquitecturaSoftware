@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from backend.domain.model.entities import Measurement
+from backend.domain.models.entities import Measurement
 
 
 class InputProvider(ABC):
