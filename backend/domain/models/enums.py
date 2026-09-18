@@ -6,6 +6,7 @@ class IndicatorLevel(str, Enum):
     BAJO = "BAJO"
     MEDIO = "MEDIO"
     OPTIMO = "OPTIMO"
+    ALTO = "ALTO"
 
 
 class PlantStatus(str, Enum):

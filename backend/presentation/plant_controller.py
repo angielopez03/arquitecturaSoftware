@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, request, current_app
 
-from models.entities import Plant
+from backend.domain.models.entities import Plant
 
-plant_bp = Blueprint("plant_bp", __name__, template_folder="../templates")
+plant_bp = Blueprint("plant_bp", __name__, template_folder="../../templates")
 
 
 @plant_bp.route("/", methods=["GET"])
