@@ -4,6 +4,7 @@ from typing import Dict, Optional
 
 from backend.domain.ports.range_repository import RangeRepository
 from backend.domain.models.value_objects import Range
+from backend.domain.errors import EspecieNoSoportada
 
 
 class CSVRangeRepository(RangeRepository):
@@ -50,15 +51,16 @@ class CSVRangeRepository(RangeRepository):
     def get_ranges(self, plant_type: str) -> Dict[str, Range]:
         """
         Obtiene los rangos de referencia para una especie específica.
+        Lanza EspecieNoSoportada si la especie no está registrada (H-06 / RF6).
         """
         data = self._load()
         key = plant_type.strip().lower()
-        return data.get(key, data["default"])
+        if key not in data:
+            raise EspecieNoSoportada(plant_type)
+        return data[key]
 
     def get_all_species(self) -> Dict[str, Dict[str, Range]]:
         """
         Retorna todas las especies reales disponibles en el CSV (RF5).
-        Filtra claves de fallback como 'default'.
         """
-        data = self._load()
-        return {k: v for k, v in data.items() if k != "default"}
+        return self._load()
