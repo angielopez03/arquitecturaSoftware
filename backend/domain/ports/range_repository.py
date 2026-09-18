@@ -1,20 +1,28 @@
 from abc import ABC, abstractmethod
 from typing import Dict
 
-from backend.domain.model.value_objects import Range
+from backend.domain.model.rango import Rango
 
 
-class RangeRepository(ABC):
+class ProveedorRangos(ABC):
     """
-    Interfaz (contrato) para obtener los rangos de referencia
-    de un tipo de planta. Los servicios dependen de ESTA clase,
-    nunca de una implementacion concreta (DIP de SOLID).
+    Puerto del dominio para obtener rangos de referencia por especie.
 
-    Para agregar una nueva fuente de datos (base de datos, API),
-    se crea una nueva clase que herede de RangeRepository e
-    implemente get_ranges(). No hay que tocar nada mas.
+    La implementacion concreta puede leer un CSV, una base de datos o
+    cualquier otra fuente sin que el dominio conozca ese detalle.
     """
 
     @abstractmethod
-    def get_ranges(self, plant_type: str) -> Dict[str, Range]:
+    def obtener_rangos(self, especie: str) -> Dict[str, Rango]:
         raise NotImplementedError
+
+
+class RangeRepository(ProveedorRangos):
+    """Adaptador temporal para el contrato anterior de infraestructura."""
+
+    @abstractmethod
+    def get_ranges(self, plant_type: str) -> Dict[str, Rango]:
+        raise NotImplementedError
+
+    def obtener_rangos(self, especie: str) -> Dict[str, Rango]:
+        return self.get_ranges(especie)
