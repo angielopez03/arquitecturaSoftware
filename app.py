@@ -2,11 +2,11 @@
 Punto de entrada principal para Railway y ejecución local.
 Mantiene compatibilidad con Procfile: web: gunicorn "app:create_app()"
 """
-import os
 from backend.app import create_app
+from backend.infrastructure.config import Config
 
-app = create_app()
+cfg = Config.from_env()
+app = create_app(cfg)
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host=cfg.host, port=cfg.port)
