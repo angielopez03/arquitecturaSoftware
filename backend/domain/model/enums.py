@@ -2,9 +2,8 @@ from enum import Enum
 
 
 class IndicatorLevel(str, Enum):
-    """Nivel de un indicador individual (humedad, luz o temperatura)."""
+    """Nivel de un indicador: carencia, rango optimo o exceso."""
     BAJO = "BAJO"
-    MEDIO = "MEDIO"
     OPTIMO = "OPTIMO"
     ALTO = "ALTO"
 
