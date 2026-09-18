@@ -5,7 +5,8 @@
  * El selector de especies se llena desde GET /api/v1/especies (RF5): este
  * archivo no contiene ni un solo nombre de especie escrito a mano.
  */
-const API = "http://localhost:5000/api/v1";
+const urlParams = new URLSearchParams(window.location.search);
+const API = urlParams.get("api") || "http://localhost:5000/api/v1";
 
 const form = document.getElementById("formulario");
 const selectEspecie = document.getElementById("especie");
