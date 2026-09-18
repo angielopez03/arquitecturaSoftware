@@ -1,5 +1,6 @@
 import csv
-from typing import Dict
+import os
+from typing import Dict, Optional
 
 from backend.domain.ports.range_repository import RangeRepository
 from backend.domain.models.value_objects import Range
@@ -7,35 +8,49 @@ from backend.domain.models.value_objects import Range
 
 class CSVRangeRepository(RangeRepository):
     """
-    Implementacion concreta de RangeRepository que lee los
-    rangos desde un archivo CSV.
+    Adaptador de infraestructura que implementa el puerto RangeRepository (RA5 / DIP).
+    Lee los rangos de referencia ambientales desde un archivo plano CSV.
 
-    Para migrar a base de datos: crear SQLRangeRepository(RangeRepository)
-    en este mismo paquete y cambiar una linea en app.py.
+    Principios arquitectónicos demostrados:
+    - RA5 / DIP: Implementa una abstracción definida en el Dominio (RangeRepository).
+      La dependencia apunta de Infraestructura hacia el Dominio, nunca al revés.
+      El Dominio y la Capa de Aplicación no tienen conocimiento de este archivo.
+    - LSP (Sustitución de Liskov): Es 100% sustituible por SQLRangeRepository,
+      un mock o cualquier otra fuente de datos sin afectar a los casos de uso.
+    - H-07: Resuelve la ubicación incorrecta del puerto que existía en el diseño inicial.
     """
 
     def __init__(self, csv_path: str):
         self._csv_path = csv_path
-        self._cache: Dict[str, Dict[str, Range]] = None
+        self._cache: Optional[Dict[str, Dict[str, Range]]] = None
 
     def _load(self) -> Dict[str, Dict[str, Range]]:
         if self._cache is not None:
             return self._cache
 
+        if not os.path.exists(self._csv_path):
+            raise FileNotFoundError(f"Archivo de rangos CSV no encontrado en la ruta: {self._csv_path}")
+
         data: Dict[str, Dict[str, Range]] = {}
         with open(self._csv_path, newline="", encoding="utf-8") as f:
             reader = csv.DictReader(f)
             for row in reader:
+                if not row or not row.get("plant_type"):
+                    continue
                 plant_type = row["plant_type"].strip().lower()
                 data[plant_type] = {
                     "humidity": Range(float(row["humidity_min"]), float(row["humidity_max"])),
                     "light": Range(float(row["light_min"]), float(row["light_max"])),
                     "temperature": Range(float(row["temperature_min"]), float(row["temperature_max"])),
                 }
+
         self._cache = data
         return data
 
     def get_ranges(self, plant_type: str) -> Dict[str, Range]:
+        """
+        Obtiene los rangos de referencia para una especie específica.
+        """
         data = self._load()
         key = plant_type.strip().lower()
         return data.get(key, data["default"])
