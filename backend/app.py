@@ -58,7 +58,14 @@ def create_app(config: Optional[Config] = None) -> Flask:
     app.config["DIAGNOSIS_SERVICE"] = diagnosis_service
     app.config["LIST_SPECIES_SERVICE"] = list_species_service
 
-    app.register_blueprint(plant_bp)
+    # 5. SEGURIDAD Y ORIGEN CRUZADO (RA7 / H-14)
+    # -------------------------------------------------------------------------
+    # Permite al front independiente (servido en otro puerto/origen) consumir la API
+    try:
+        from flask_cors import CORS
+        CORS(app, resources={r"/*": {"origins": cfg.cors_origins}})
+    except ImportError:
+        pass
 
     return app
 
