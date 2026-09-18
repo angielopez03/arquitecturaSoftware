@@ -1,3 +1,6 @@
+from typing import Mapping
+
+from backend.domain.errors import ParametroInvalido
 from backend.domain.model.enums import IndicatorLevel
 
 
@@ -21,3 +24,23 @@ class IndicatorEvaluator:
             return IndicatorLevel.ALTO
 
         return IndicatorLevel.OPTIMO
+
+    def evaluate_collection(
+        self,
+        values: Mapping[str, float],
+        optimal_ranges: Mapping[str, object],
+    ) -> dict[str, IndicatorLevel]:
+        nombres_valores = set(values)
+        nombres_rangos = set(optimal_ranges)
+        if nombres_valores != nombres_rangos:
+            faltantes = sorted(nombres_rangos - nombres_valores)
+            sobrantes = sorted(nombres_valores - nombres_rangos)
+            raise ParametroInvalido(
+                "indicadores",
+                f"colecciones incompatibles; faltantes={faltantes}, sobrantes={sobrantes}",
+            )
+
+        return {
+            nombre: self.evaluate(values[nombre], optimal_ranges[nombre])
+            for nombre in optimal_ranges
+        }
