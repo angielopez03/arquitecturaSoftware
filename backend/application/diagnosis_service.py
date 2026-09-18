@@ -1,9 +1,9 @@
 from typing import Dict
 
-from models.entities import Plant, Measurement
-from models.enums import IndicatorLevel, PlantStatus
-from repositories.range_repository import RangeRepository
-from services.indicator_evaluator import IndicatorEvaluator
+from backend.domain.model.entities import Plant, Measurement
+from backend.domain.model.enums import IndicatorLevel, PlantStatus
+from backend.domain.ports.range_repository import RangeRepository
+from backend.domain.rules.indicator_evaluator import IndicatorEvaluator
 
 
 class DiagnosisService:

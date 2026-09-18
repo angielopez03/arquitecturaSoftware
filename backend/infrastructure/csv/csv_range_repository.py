@@ -1,8 +1,8 @@
 import csv
 from typing import Dict
 
-from repositories.range_repository import RangeRepository
-from models.value_objects import Range
+from backend.domain.ports.range_repository import RangeRepository
+from backend.domain.model.value_objects import Range
 
 
 class CSVRangeRepository(RangeRepository):

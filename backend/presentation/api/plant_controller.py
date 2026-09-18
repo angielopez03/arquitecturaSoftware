@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, current_app
 
-from models.entities import Plant
+from backend.domain.model.entities import Plant
 
 plant_bp = Blueprint("plant_bp", __name__, template_folder="../templates")
 

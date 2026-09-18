@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict
 
-from models.value_objects import Range
+from backend.domain.model.value_objects import Range
 
 
 class RangeRepository(ABC):

@@ -1,5 +1,5 @@
-from models.enums import IndicatorLevel
-from models.value_objects import Range
+from backend.domain.model.enums import IndicatorLevel
+from backend.domain.model.value_objects import Range
 
 MEDIO_THRESHOLD_RATIO = 0.20
 

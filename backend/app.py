@@ -1,11 +1,11 @@
 import os
 from flask import Flask
 
-from services.indicator_evaluator import IndicatorEvaluator
-from services.diagnosis_service import DiagnosisService
-from repositories.csv_range_repository import CSVRangeRepository
-from repositories.input_provider import ManualInputProvider
-from controllers.plant_controller import plant_bp
+from backend.domain.rules.indicator_evaluator import IndicatorEvaluator
+from backend.application.diagnosis_service import DiagnosisService
+from backend.infrastructure.csv.csv_range_repository import CSVRangeRepository
+from backend.infrastructure.input_provider import ManualInputProvider
+from backend.presentation.api.plant_controller import plant_bp
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CSV_PATH = os.path.join(BASE_DIR, "data", "plant_ranges.csv")
