@@ -1,7 +1,4 @@
 from backend.domain.model.enums import IndicatorLevel
-from backend.domain.model.value_objects import Range
-
-MEDIO_THRESHOLD_RATIO = 0.20
 
 
 class IndicatorEvaluator:
@@ -10,12 +7,17 @@ class IndicatorEvaluator:
     de un valor dado su Range optimo.
     """
 
-    def evaluate(self, value: float, optimal_range: Range) -> IndicatorLevel:
-        if optimal_range.contains(value):
-            return IndicatorLevel.OPTIMO
+    def evaluate(self, value: float, optimal_range) -> IndicatorLevel:
+        if hasattr(optimal_range, "minimo"):
+            minimum = optimal_range.minimo
+            maximum = optimal_range.maximo
+        else:
+            minimum = optimal_range.min_value
+            maximum = optimal_range.max_value
 
-        ratio = optimal_range.distance_ratio(value)
-        if ratio <= MEDIO_THRESHOLD_RATIO:
-            return IndicatorLevel.MEDIO
+        if value < minimum:
+            return IndicatorLevel.BAJO
+        if value > maximum:
+            return IndicatorLevel.ALTO
 
-        return IndicatorLevel.BAJO
+        return IndicatorLevel.OPTIMO
