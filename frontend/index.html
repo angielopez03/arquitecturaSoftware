@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Diagnostico de plantas</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main>
+    <h1>Diagnostico de plantas</h1>
+    <p class="sub">Ingrese las condiciones actuales del sustrato y el ambiente.</p>
+
+    <!-- Sin atributo action ni method: el envio lo hace fetch, la pagina no se recarga (RA2) -->
+    <form id="formulario" novalidate>
+      <label for="especie">Especie</label>
+      <select id="especie" name="especie" required>
+        <option value="">Cargando especies...</option>
+      </select>
+      <p class="ayuda" id="ayuda-rangos"></p>
+
+      <label for="humedad">Humedad del sustrato (%)</label>
+      <input type="number" id="humedad" name="humedad" step="0.1" required>
+
+      <label for="luz">Nivel de luz (lux)</label>
+      <input type="number" id="luz" name="luz" step="1" required>
+
+      <label for="temperatura">Temperatura (&deg;C)</label>
+      <input type="number" id="temperatura" name="temperatura" step="0.1" required>
+
+      <button type="submit" id="boton">Diagnosticar</button>
+    </form>
+
+    <!-- Bloque de error: visible solo cuando la API responde con error (RF6) -->
+    <section id="error" class="error oculto" role="alert" aria-live="assertive">
+      <h2 id="error-titulo"></h2>
+      <p id="error-mensaje"></p>
+      <p class="codigo" id="error-codigo"></p>
+    </section>
+
+    <!-- Bloque de resultado -->
+    <section id="resultado" class="oculto" aria-live="polite">
+      <div class="estado" id="estado"></div>
+      <table>
+        <thead>
+          <tr><th>Parametro</th><th>Valor</th><th>Rango optimo</th><th>Estado</th></tr>
+        </thead>
+        <tbody id="tabla-parametros"></tbody>
+      </table>
+      <div id="recomendaciones"></div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
