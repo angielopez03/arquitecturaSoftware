@@ -4,7 +4,6 @@ from flask import Flask
 from backend.domain.rules.indicator_evaluator import IndicatorEvaluator
 from backend.application.diagnosis_service import DiagnosisService
 from backend.infrastructure.csv_range_repository import CSVRangeRepository
-from backend.infrastructure.input_provider import ManualInputProvider
 from backend.presentation.plant_controller import plant_bp
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -19,13 +18,9 @@ def create_app() -> Flask:
     # Cambiar CSV -> DB: reemplazar esta línea por SQLRangeRepository(...)
     range_repository = CSVRangeRepository(CSV_PATH)
 
-    # Cambiar manual -> sensor: reemplazar esta línea por SensorInputProvider(...)
-    input_provider = ManualInputProvider()
-
     evaluator = IndicatorEvaluator()
     diagnosis_service = DiagnosisService(repository=range_repository, evaluator=evaluator)
 
-    app.config["INPUT_PROVIDER"] = input_provider
     app.config["DIAGNOSIS_SERVICE"] = diagnosis_service
 
     app.register_blueprint(plant_bp)

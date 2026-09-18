@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, current_app
 
-from backend.domain.models.entities import Plant
+from backend.domain.models.entities import Plant, Measurement
 
 plant_bp = Blueprint("plant_bp", __name__, template_folder="../../templates")
 
@@ -14,18 +14,20 @@ def index():
 @plant_bp.route("/evaluar", methods=["POST"])
 def evaluar():
     """
-    Controller (MVC): recibe la request HTTP, delega en los
-    servicios/repositorios inyectados, y renderiza la vista.
-    No contiene logica de negocio.
+    Controller: recibe la request HTTP, construye los objetos de dominio en el borde (RA6)
+    y delega en el caso de uso DiagnosisService.
     """
-    input_provider = current_app.config["INPUT_PROVIDER"]
     diagnosis_service = current_app.config["DIAGNOSIS_SERVICE"]
 
     plant = Plant(
         name=request.form["plant_name"],
         plant_type=request.form["plant_type"],
     )
-    measurement = input_provider.get_measurement(request.form)
+    measurement = Measurement(
+        humidity=float(request.form["humidity"]),
+        light=float(request.form["light"]),
+        temperature=float(request.form["temperature"]),
+    )
 
     result = diagnosis_service.diagnose(plant, measurement)
 
